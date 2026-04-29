@@ -1,4 +1,5 @@
 type CardItem = {
+  id?: number;
   name: string;
   total: number;
   week: string;

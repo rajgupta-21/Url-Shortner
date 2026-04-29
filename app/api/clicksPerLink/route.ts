@@ -1,44 +1,55 @@
 import { dbConnect } from "@/app/db/db";
 import { ClickModel } from "@/app/schemas/user-url-clicks.Schema";
+import jwt from "jsonwebtoken";
+
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { urlId: string } },
-) {
-  const { urlId } = params;
-
+export async function GET(req: NextRequest) {
   try {
     await dbConnect();
 
-    const objectUrlId = new mongoose.Types.ObjectId(urlId);
+    const token = req.cookies.get("token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    } catch {
+      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    }
+
+    const userId = decoded.id;
 
     const analytics = await ClickModel.aggregate([
       {
-        $match: { urlId: objectUrlId },
+        $lookup: {
+          from: "urls",
+          localField: "urlId",
+          foreignField: "_id",
+          as: "url",
+        },
       },
+      { $unwind: "$url" },
+
+      {
+        $match: {
+          "url.userId": new mongoose.Types.ObjectId(userId),
+        },
+      },
+
       {
         $facet: {
           totalClicks: [{ $count: "count" }],
 
           clicksPerCountry: [
-            {
-              $group: {
-                _id: "$country",
-                count: { $sum: 1 },
-              },
-            },
+            { $group: { _id: "$country", count: { $sum: 1 } } },
           ],
 
-          clicksPerDevice: [
-            {
-              $group: {
-                _id: "$device",
-                count: { $sum: 1 },
-              },
-            },
-          ],
+          clicksPerDevice: [{ $group: { _id: "$device", count: { $sum: 1 } } }],
 
           clicksPerDay: [
             {
@@ -54,15 +65,6 @@ export async function GET(
             },
             { $sort: { _id: 1 } },
           ],
-
-          clicksPerWeek: [
-            {
-              $group: {
-                _id: { $week: "$createdAt" },
-                count: { $sum: 1 },
-              },
-            },
-          ],
         },
       },
     ]);
@@ -72,9 +74,7 @@ export async function GET(
     return NextResponse.json(
       {
         message: "Success",
-
         totalClicks: result.totalClicks[0]?.count || 0,
-
         clicksPerCountry: result.clicksPerCountry,
         clicksPerDevice: result.clicksPerDevice,
         clicksPerDay: result.clicksPerDay,

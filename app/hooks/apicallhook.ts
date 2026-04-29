@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 type FetchOptions = {
   method?: string;
   headers?: Record<string, string>;
-  body?: string | unknown;
+  body?: unknown;
+  credentials?: RequestCredentials;
 };
 
 export const useApiCall = <T = unknown>(
@@ -18,6 +19,8 @@ export const useApiCall = <T = unknown>(
   useEffect(() => {
     if (!url) return;
 
+    const controller = new AbortController();
+
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -28,17 +31,25 @@ export const useApiCall = <T = unknown>(
             "Content-Type": "application/json",
             ...(options?.headers || {}),
           },
-          body: options?.body ? JSON.stringify(options.body) : undefined,
+          body:
+            options?.body && typeof options.body !== "string"
+              ? JSON.stringify(options.body)
+              : (options?.body as string | undefined),
+          credentials: options?.credentials || "include",
+          signal: controller.signal,
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-          throw new Error("Request failed");
+          throw new Error(result?.message || "Request failed");
         }
 
-        const result = await response.json();
         setData(result);
         setError(null);
       } catch (err: unknown) {
+        if ((err as any)?.name === "AbortError") return;
+
         setError(err instanceof Error ? err.message : "Error occurred");
       } finally {
         setLoading(false);
@@ -46,7 +57,11 @@ export const useApiCall = <T = unknown>(
     };
 
     fetchData();
-  }, [url]);
+
+    return () => {
+      controller.abort(); // ✅ cleanup
+    };
+  }, [url, JSON.stringify(options)]); // ✅ track options
 
   return { data, error, loading };
 };

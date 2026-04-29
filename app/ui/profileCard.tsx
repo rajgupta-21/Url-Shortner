@@ -8,6 +8,7 @@ type ProfileProps = {
   linksLimit: number;
   clicksTracked: number;
   clicksLimit: number;
+  plan?: string;
 };
 
 const ProgressBar = ({ value, max }: { value: number; max: number }) => {
@@ -31,6 +32,7 @@ const ProfileCard: React.FC<ProfileProps> = ({
   linksLimit,
   clicksTracked,
   clicksLimit,
+  plan,
 }) => {
   const initials = name
     ? name
@@ -61,7 +63,7 @@ const ProfileCard: React.FC<ProfileProps> = ({
         {/* Plan Badge */}
         <div className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-lg">
           <Star size={16} className="text-blue-500" />
-          <span className="text-blue-600 font-medium text-sm">Free Plan</span>
+          <span className="text-blue-600 font-medium text-sm">{plan}</span>
         </div>
       </div>
 

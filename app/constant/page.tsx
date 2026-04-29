@@ -1,5 +1,7 @@
 import {
   ChartBarIncreasing,
+  LogIn,
+  LogInIcon,
   PanelsTopLeft,
   Settings,
   User,
@@ -37,5 +39,17 @@ export const items = [
     name: "Settings",
     icon: Settings,
     link: "/components/settings",
+  },
+  {
+    id: "login",
+    name: "login",
+    icon: LogIn,
+    link: "/components/login",
+  },
+  {
+    id: "register",
+    name: "register",
+    icon: LogInIcon,
+    link: "/components/register",
   },
 ];

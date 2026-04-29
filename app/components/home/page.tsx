@@ -45,6 +45,7 @@ const HomePage = () => {
 
       const response = await fetch("/api/url-shortner", {
         method: "POST",
+        credentials: "include",
         body: JSON.stringify({ url }),
         headers: { "Content-Type": "application/json" },
       });
@@ -116,11 +117,11 @@ const HomePage = () => {
           {urlValerror && <div className="text-red-500">Not a Valid Url</div>}
           {error && <div className="text-red-500">Somthing Went Wrong</div>}
           {data && (
-            <div className="flex gap-4 justify-center items-center">
+            <div className="flex gap-4 justify-between p-2 items-center bg-blue-100 rounded-xl border">
               <div className="text-black">{data}</div>
 
               <span
-                className="text-white cursor-pointer p-3 rounded-xl bg-black"
+                className="text-white cursor-pointer p-2 rounded-xl bg-black"
                 onClick={handleCopy}
               >
                 {copy ? "Copied!" : "Copy"}

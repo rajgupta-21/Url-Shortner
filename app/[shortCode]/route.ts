@@ -1,9 +1,9 @@
 import { dbConnect } from "@/app/db/db";
-import { UrlModel } from "@/app/schemas/user-url-clicks.Schema";
+import { ClickModel, UrlModel } from "@/app/schemas/user-url-clicks.Schema";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { shortCode: string } },
 ) {
   try {
@@ -29,8 +29,14 @@ export async function GET(
         { status: 404 },
       );
     }
+    await ClickModel.create({
+      urlId: urlDoc._id,
+      country: "India",
+      device: "Desktop",
+      ip: req.headers.get("x-forwarded-for") || "unknown",
+    });
 
-    return NextResponse.redirect(urlDoc.originalUrl, 302);
+    return NextResponse.redirect(urlDoc.originalUrl, { status: 302 });
   } catch (error) {
     return NextResponse.json(
       {

@@ -11,6 +11,7 @@ const ProfilePage = () => {
       _id: string;
       name: string;
       email: string;
+      plan: string;
       createdAt: string;
     };
   };
@@ -45,6 +46,7 @@ const ProfilePage = () => {
             name={user?.name || "undefined"}
             email={user?.email || "undefined"}
             timeline={user?.createdAt || "undefined"}
+            plan={user?.plan || "undefined"}
             linksCreated={10}
             linksLimit={100}
             clicksTracked={100}
@@ -54,7 +56,7 @@ const ProfilePage = () => {
           <AccountDetails
             name={user?.name || "undefined"}
             email={user?.email || "undefined"}
-            plan="Free plan"
+            plan={user?.plan || "undefined"}
             domain="linkSnap.io"
             joinedAt={user?.createdAt || "undefined"}
             lastLogin="today"
