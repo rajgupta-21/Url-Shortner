@@ -12,7 +12,6 @@ const HomePage = () => {
   const [error, setError] = useState<boolean>(false);
   const [copy, setCopy] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
   const isValidUrl = (value: string) => {
     try {
       if (!value.startsWith("http://") && !value.startsWith("https://")) {

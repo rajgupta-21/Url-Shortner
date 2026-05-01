@@ -9,7 +9,6 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
-// Register components
 ChartJS.register(
   CategoryScale,
   LinearScale,

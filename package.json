@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "dev": "kill -9 $(lsof -ti:3000) 2>/dev/null; next dev",
     "lint": "eslint"
   },
   "dependencies": {
@@ -17,7 +16,8 @@
     "next": "16.2.4",
     "react": "19.2.4",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "redis": "^5.12.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

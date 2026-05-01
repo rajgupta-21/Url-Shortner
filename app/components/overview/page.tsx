@@ -2,6 +2,8 @@
 import { useApiCall } from "@/app/hooks/apicallhook";
 import Card from "@/app/ui/card";
 import BarChart from "@/app/ui/chart";
+import MylinksTable, { LinkItem } from "@/app/ui/mylinks";
+import { useEffect, useState } from "react";
 
 const OverviewPage = () => {
   const { data, error, loading } = useApiCall(`/api/clicksPerLink`, {
@@ -9,10 +11,32 @@ const OverviewPage = () => {
     credentials: "include",
   });
 
+  const [urlData, setUrlData] = useState<LinkItem[]>([]);
+  const [urlError, setUrlError] = useState("");
+  const [urlLoading, setUrlLoading] = useState(false);
+  useEffect(() => {
+    const Fetchdata = async () => {
+      try {
+        setUrlLoading(true);
+        const data = await fetch("/api/get-user-links", {
+          method: "GET",
+          credentials: "include",
+        });
+        const response = await data.json();
+        setUrlData(response.links);
+        setUrlLoading(false);
+        console.log(response);
+      } catch (err) {
+        setUrlError("Failed to fetch data");
+        setUrlLoading(false);
+        console.error("Failed to fetch data", err);
+      }
+    };
+    Fetchdata();
+  }, [data]);
   if (loading) return <div className="p-4">Loading...</div>;
   if (error)
     return <div className="p-4 text-red-500">Something went wrong</div>;
-
   const item = [
     {
       name: "Total Clicks",
@@ -47,7 +71,10 @@ const OverviewPage = () => {
       <div className="m-4 h-96 border-2 border-gray-200 p-4 bg-white rounded-xl ">
         <BarChart />
       </div>
-      <div>linksCard</div>
+      <div className="p-4  ">
+        {urlError && <div className="text-red-500 mb-4">{urlError}</div>}
+        {urlLoading ? <div>Loading...</div> : <MylinksTable links={urlData} />}
+      </div>
     </div>
   );
 };
