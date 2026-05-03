@@ -41,14 +41,14 @@ const MylinksTable: React.FC<Props> = ({ links }) => {
 
         {/* Body */}
         <tbody>
-          {links.length === 0 ? (
+          {links?.length === 0 ? (
             <tr>
               <td colSpan={5} className="text-center py-6 text-gray-400">
                 No links found
               </td>
             </tr>
           ) : (
-            links.map((link) => {
+            links?.map((link) => {
               const shortUrl = `http://localhost:3000/${link.shortCode}`;
 
               return (
