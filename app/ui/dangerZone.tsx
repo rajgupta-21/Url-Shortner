@@ -47,11 +47,6 @@ const DangerZone = () => {
           />
         </div>
       </div>
-      <div className="px-5 flex justify-end">
-        <button className="text-black bg-white font-extralight flex text-shadow-gray-600 p-2 rounded-xl border border-gray-400 cursor-pointer hover:bg-gray-300 ">
-          Save Changes
-        </button>
-      </div>
     </div>
   );
 };

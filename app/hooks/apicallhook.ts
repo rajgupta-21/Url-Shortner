@@ -59,9 +59,8 @@ export const useApiCall = <T = unknown>(
     fetchData();
 
     return () => {
-      controller.abort(); // ✅ cleanup
+      controller.abort();
     };
-  }, [url, JSON.stringify(options)]); // ✅ track options
-
+  }, [url, JSON.stringify(options)]);
   return { data, error, loading };
 };
