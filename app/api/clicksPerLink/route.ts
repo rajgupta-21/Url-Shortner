@@ -65,6 +65,44 @@ export async function GET(req: NextRequest) {
             },
             { $sort: { _id: 1 } },
           ],
+          clicksPerWeek: [
+            {
+              $group: {
+                _id: {
+                  year: { $isoWeekYear: "$createdAt" },
+                  week: { $isoWeek: "$createdAt" },
+                },
+
+                count: { $sum: 1 },
+              },
+            },
+
+            {
+              $sort: {
+                "_id.year": 1,
+                "_id.week": 1,
+              },
+            },
+          ],
+          clicksPerMonth: [
+            {
+              $group: {
+                _id: {
+                  year: { $year: "$createdAt" },
+                  month: { $month: "$createdAt" },
+                },
+
+                count: { $sum: 1 },
+              },
+            },
+
+            {
+              $sort: {
+                "_id.year": 1,
+                "_id.month": 1,
+              },
+            },
+          ],
         },
       },
     ]);
@@ -79,6 +117,7 @@ export async function GET(req: NextRequest) {
         clicksPerDevice: result.clicksPerDevice,
         clicksPerDay: result.clicksPerDay,
         clicksPerWeek: result.clicksPerWeek,
+        clicksPerMonth: result.clicksPerMonth,
       },
       { status: 200 },
     );

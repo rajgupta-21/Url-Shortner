@@ -69,7 +69,11 @@ const OverviewPage = () => {
       <Card items={item} />
 
       <div className="m-4 h-96 border-2 border-gray-200 p-4 bg-white rounded-xl ">
-        <BarChart />
+        <BarChart
+          clicksPerDay={data?.clicksPerDay || []}
+          clicksPerWeek={data?.clicksPerWeek || []}
+          clicksPerMonth={data?.clicksPerMonth || []}
+        />
       </div>
       <div className="p-4  ">
         {urlError && <div className="text-red-500 mb-4">{urlError}</div>}
