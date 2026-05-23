@@ -4,6 +4,7 @@ import { useApiCall } from "@/app/hooks/apicallhook";
 import AccountDetails from "@/app/ui/accountDetailsCard";
 import Button from "@/app/ui/button";
 import ProfileCard from "@/app/ui/profileCard";
+import { useEffect, useState } from "react";
 
 const ProfilePage = () => {
   type UserResponse = {
@@ -17,13 +18,26 @@ const ProfilePage = () => {
   };
   const userId =
     typeof window !== "undefined" ? localStorage.getItem("userID") : null;
-
+  const [numberOfLinks, setNumberOfLinks] = useState<number>(0);
   const { data, error, loading } = useApiCall<UserResponse>(
     userId ? `/api/get-user?userId=${userId}` : null,
     {
       method: "GET",
     },
   );
+
+  useEffect(() => {
+    const handleUserLinks = async () => {
+      const response = await fetch("/api/get-user-links", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log(typeof data.links.length);
+      setNumberOfLinks(data.links.length);
+    };
+    handleUserLinks();
+  }, []);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error fetching user</div>;
@@ -47,7 +61,7 @@ const ProfilePage = () => {
             email={user?.email || "undefined"}
             timeline={user?.createdAt || "undefined"}
             plan={user?.plan || "undefined"}
-            linksCreated={10}
+            linksCreated={numberOfLinks}
             linksLimit={100}
             clicksTracked={100}
             clicksLimit={200}

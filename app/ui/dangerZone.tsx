@@ -1,9 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 import Button from "./button";
 
-const DangerZone = ({ setIsOpenDialogBox }) => {
-
+const DangerZone = ({ setIsOpenDialogBox, setIsOpenDialogBoxForUser }) => {
   return (
     <div>
       <div className="m-5 p-5 rounded-xl border-[0.8px] border-red-400 ">
@@ -51,6 +49,10 @@ const DangerZone = ({ setIsOpenDialogBox }) => {
           <Button
             buttonText="Delete Account"
             className="rounded-xl border border-red-400 text-red-500 bg-gray-50 px-3 py-2 text-sm font-extralight  transition hover:bg-gray-100"
+            onClick={() => {
+              // HandleDeleteLinks();
+              setIsOpenDialogBoxForUser(true);
+            }}
           />
         </div>
       </div>

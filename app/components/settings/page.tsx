@@ -9,20 +9,29 @@ const SettingsPage = () => {
   const [name, setName] = useState<string | null>("");
   const [email, setEmail] = useState<string | null>("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [emailid, setemail] = useState<string | null>(null);
 
   const [isOpenDialogBox, setIsOpenDialogBox] = useState<boolean>(false);
+  const [isOpenDialogBoxForUser, setIsOpenDialogBoxForUser] =
+    useState<boolean>(false);
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userID");
+    const storedEmail = localStorage.getItem("email");
 
     if (!storedUserId) {
       console.error("User ID not found in localStorage");
       return;
     }
-
+    console.log(storedEmail);
+    if (!storedEmail) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+    setemail(storedEmail);
     setUserId(storedUserId);
   }, []);
 
@@ -50,6 +59,29 @@ const SettingsPage = () => {
     }
   };
 
+  const HandleDeleteUser = async () => {
+    try {
+      setIsDeleting(true);
+
+      const response = await fetch("/api/delete-account", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ emailid }),
+      });
+
+      const data = await response.json();
+
+      console.log(data);
+
+      setIsOpenDialogBox(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   const HandleSubmit = async () => {
     try {
       setIsSaving(true);
@@ -113,6 +145,39 @@ const SettingsPage = () => {
           </div>
         </div>
       )}
+      {isOpenDialogBoxForUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex flex-col gap-3">
+              <h2 className="text-xl font-semibold text-red-500">
+                Delete Account
+              </h2>
+
+              <p className="text-sm text-gray-500 leading-relaxed">
+                This action will permanently delete all your shortened links and
+                analytics. This cannot be undone.
+              </p>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="rounded-xl border border-gray-300 px-4 py-2 text-sm transition hover:bg-gray-100"
+                onClick={() => setIsOpenDialogBoxForUser(false)}
+              >
+                Cancel
+              </button>
+
+              <button
+                className={`rounded-xl bg-red-500 px-4 py-2 text-sm text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 `}
+                disabled={isDeleting}
+                onClick={HandleDeleteUser}
+              >
+                {isDeleting ? "Deleting..." : "Deleting Account"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="border-b border-gray-200 bg-white px-5 py-4">
@@ -129,7 +194,10 @@ const SettingsPage = () => {
 
       <LinkDefaultsSection />
 
-      <DangerZone setIsOpenDialogBox={setIsOpenDialogBox} />
+      <DangerZone
+        setIsOpenDialogBox={setIsOpenDialogBox}
+        setIsOpenDialogBoxForUser={setIsOpenDialogBoxForUser}
+      />
 
       {/* Footer */}
       <div className="flex justify-end px-5 py-5">

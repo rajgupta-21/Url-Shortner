@@ -20,6 +20,7 @@ const LoginPage = () => {
     });
     const data = await response.json();
     localStorage.setItem("userID", data.userId);
+    localStorage.setItem("email", data.email);
     console.log(data);
   };
 

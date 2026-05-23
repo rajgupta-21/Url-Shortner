@@ -41,7 +41,13 @@ export async function POST(req: Request) {
       { expiresIn: "1d" },
     );
     const response = NextResponse.json(
-      { message: "Login successful", user, userId: user._id, plan: user.plan },
+      {
+        message: "Login successful",
+        user,
+        userId: user._id,
+        plan: user.plan,
+        email: user.email,
+      },
       { status: 200 },
     );
 
