@@ -14,6 +14,9 @@ export type Props = {
 };
 
 const MylinksTable: React.FC<Props> = ({ links }) => {
+  const origin =
+    typeof window !== "undefined" ? window.location.origin : "";
+
   const handleCopy = async (shortUrl: string) => {
     try {
       await navigator.clipboard.writeText(shortUrl);
@@ -43,13 +46,13 @@ const MylinksTable: React.FC<Props> = ({ links }) => {
         <tbody>
           {links?.length === 0 ? (
             <tr>
-              <td colSpan={5} className="text-center py-6 text-gray-400">
+              <td colSpan={6} className="text-center py-6 text-gray-400">
                 No links found
               </td>
             </tr>
           ) : (
             links?.map((link) => {
-              const shortUrl = `http://localhost:3000/${link.shortCode}`;
+              const shortUrl = `${origin}/${link.shortCode}`;
 
               return (
                 <tr
@@ -70,8 +73,16 @@ const MylinksTable: React.FC<Props> = ({ links }) => {
                   <td className="py-3 px-2 text-gray-500 text-sm">
                     {new Date(link.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="py-3 px-2 font-semibold text-black">
-                    {link.isActive}
+                  <td className="py-3 px-2">
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        link.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {link.isActive ? "Active" : "Inactive"}
+                    </span>
                   </td>
 
                   <td className="py-3 px-2 text-right flex gap-2 justify-end">

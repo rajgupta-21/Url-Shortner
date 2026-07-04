@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const user = await UserModel.findById(userId);
+    const user = await UserModel.findById(userId).select("-password");
 
     if (!user) {
       return NextResponse.json(

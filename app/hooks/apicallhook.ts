@@ -16,6 +16,9 @@ export const useApiCall = <T = unknown>(
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Serialize the options so the effect only re-runs when they actually change.
+  const optionsKey = JSON.stringify(options ?? {});
+
   useEffect(() => {
     if (!url) return;
 
@@ -48,7 +51,7 @@ export const useApiCall = <T = unknown>(
         setData(result);
         setError(null);
       } catch (err: unknown) {
-        if ((err as any)?.name === "AbortError") return;
+        if (err instanceof Error && err.name === "AbortError") return;
 
         setError(err instanceof Error ? err.message : "Error occurred");
       } finally {
@@ -61,6 +64,8 @@ export const useApiCall = <T = unknown>(
     return () => {
       controller.abort();
     };
-  }, [url, JSON.stringify(options)]);
+    // `options` is intentionally tracked via `optionsKey` above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, optionsKey]);
   return { data, error, loading };
 };

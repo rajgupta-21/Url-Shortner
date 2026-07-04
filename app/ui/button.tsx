@@ -17,7 +17,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={` rounded-lg bg-blue-600 text-gray-600 text-sm cursor-pointer ${className}`}
+      className={`rounded-lg bg-blue-600 text-sm text-gray-600 cursor-pointer disabled:cursor-not-allowed ${className}`}
       {...rest}
     >
       {buttonText}

@@ -3,13 +3,17 @@
 import AccountsSection from "@/app/ui/accountsSection";
 import DangerZone from "@/app/ui/dangerZone";
 import LinkDefaultsSection from "@/app/ui/linksDefault";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const SettingsPage = () => {
+  const router = useRouter();
+
   const [name, setName] = useState<string | null>("");
   const [email, setEmail] = useState<string | null>("");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [emailid, setemail] = useState<string | null>(null);
+  const [userId] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("userID") : null,
+  );
 
   const [isOpenDialogBox, setIsOpenDialogBox] = useState<boolean>(false);
   const [isOpenDialogBoxForUser, setIsOpenDialogBoxForUser] =
@@ -18,38 +22,14 @@ const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    const storedUserId = localStorage.getItem("userID");
-    const storedEmail = localStorage.getItem("email");
-
-    if (!storedUserId) {
-      console.error("User ID not found in localStorage");
-      return;
-    }
-    console.log(storedEmail);
-    if (!storedEmail) {
-      console.error("User ID not found in localStorage");
-      return;
-    }
-    setemail(storedEmail);
-    setUserId(storedUserId);
-  }, []);
-
   const HandleDeleteLinks = async () => {
     try {
       setIsDeleting(true);
 
-      const response = await fetch("/api/delete-links", {
+      await fetch("/api/delete-links", {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
+        credentials: "include",
       });
-
-      const data = await response.json();
-
-      console.log(data);
 
       setIsOpenDialogBox(false);
     } catch (error) {
@@ -63,19 +43,16 @@ const SettingsPage = () => {
     try {
       setIsDeleting(true);
 
-      const response = await fetch("/api/delete-account", {
+      await fetch("/api/delete-account", {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ emailid }),
+        credentials: "include",
       });
 
-      const data = await response.json();
+      localStorage.removeItem("userID");
+      localStorage.removeItem("email");
 
-      console.log(data);
-
-      setIsOpenDialogBox(false);
+      setIsOpenDialogBoxForUser(false);
+      router.push("/components/register");
     } catch (error) {
       console.error(error);
     } finally {

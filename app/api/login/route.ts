@@ -1,7 +1,7 @@
 import { dbConnect } from "@/app/db/db";
+import { authCookieOptions, createToken } from "@/app/lib/auth";
 import { UserModel } from "@/app/schemas/user-url-clicks.Schema";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -35,15 +35,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: "1d" },
-    );
+    const token = createToken({ id: user._id.toString(), email: user.email });
+
     const response = NextResponse.json(
       {
         message: "Login successful",
-        user,
         userId: user._id,
         plan: user.plan,
         email: user.email,
@@ -51,18 +47,15 @@ export async function POST(req: Request) {
       { status: 200 },
     );
 
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60 * 24,
-    });
+    response.cookies.set("token", token, authCookieOptions);
 
     return response;
   } catch (error) {
     return NextResponse.json(
-      { message: "Internal Server Error", error },
+      {
+        message: "Internal Server Error",
+        error: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

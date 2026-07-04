@@ -43,9 +43,9 @@ const ProfileCard: React.FC<ProfileProps> = ({
     : "";
 
   return (
-    <div className="bg-white text-black m-10 border border-gray-200 rounded-2xl shadow-sm">
+    <div className="bg-white text-black m-4 md:m-10 border border-gray-200 rounded-2xl shadow-sm">
       {/* 🔹 Header */}
-      <div className="flex items-center justify-between p-8">
+      <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <div className="size-16 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold text-lg">

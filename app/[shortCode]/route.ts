@@ -1,15 +1,17 @@
 import { dbConnect } from "@/app/db/db";
+import { detectDevice } from "@/app/lib/device";
 import { ClickModel, UrlModel } from "@/app/schemas/user-url-clicks.Schema";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { shortCode: string } },
+  { params }: { params: Promise<{ shortCode: string }> },
 ) {
   try {
     await dbConnect();
 
     const { shortCode } = await params;
+
     if (!shortCode) {
       return NextResponse.json(
         { message: "Short code is required" },
@@ -17,11 +19,7 @@ export async function GET(
       );
     }
 
-    const urlDoc = await UrlModel.findOneAndUpdate(
-      { shortCode },
-      { $inc: { clicks: 1 } },
-      { new: true },
-    );
+    const urlDoc = await UrlModel.findOne({ shortCode });
 
     if (!urlDoc) {
       return NextResponse.json(
@@ -29,10 +27,23 @@ export async function GET(
         { status: 404 },
       );
     }
+
+    if (!urlDoc.isActive) {
+      return NextResponse.json(
+        { message: "This link has been disabled" },
+        { status: 410 },
+      );
+    }
+
+    urlDoc.clicks += 1;
+    await urlDoc.save();
+
+    const userAgent = req.headers.get("user-agent") || "";
+
     await ClickModel.create({
       urlId: urlDoc._id,
-      country: "India",
-      device: "Desktop",
+      country: "Unknown",
+      device: detectDevice(userAgent),
       ip: req.headers.get("x-forwarded-for") || "unknown",
     });
 

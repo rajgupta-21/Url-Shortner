@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { navItems } from "../constant/page";
+import { navItems } from "../constant/constants";
 import Button from "./button";
 type NavbarProps = {
   className?: string;

@@ -9,12 +9,6 @@ declare global {
   var mongoose: MongooseCache | undefined;
 }
 
-const MONGO_URL = process.env.MONGO_URL!;
-
-if (!MONGO_URL) {
-  throw new Error("Please define the MONGO_URL environment variable");
-}
-
 let cached = global.mongoose;
 
 if (!cached) {
@@ -24,6 +18,12 @@ if (!cached) {
 export const dbConnect = async () => {
   if (cached.conn) {
     return cached.conn;
+  }
+
+  const MONGO_URL = process.env.MONGO_URL;
+
+  if (!MONGO_URL) {
+    throw new Error("Please define the MONGO_URL environment variable");
   }
 
   if (!cached.promise) {

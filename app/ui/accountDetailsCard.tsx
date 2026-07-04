@@ -18,9 +18,9 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   lastLogin,
 }) => {
   return (
-    <div className="bg-white text-black m-10 border border-gray-200 rounded-2xl shadow-sm">
+    <div className="bg-white text-black m-4 md:m-10 border border-gray-200 rounded-2xl shadow-sm">
       {/* 🔹 Header */}
-      <div className="p-8 border-b border-gray-100">
+      <div className="p-6 sm:p-8 border-b border-gray-100">
         <h2 className="text-xl font-semibold">Account Details</h2>
         <p className="text-sm text-gray-500">
           Manage your account information and settings
