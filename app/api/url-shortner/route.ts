@@ -1,6 +1,7 @@
 import { dbConnect } from "@/app/db/db";
+import { getAuthUser } from "@/app/lib/auth";
+import { getBaseUrl } from "@/app/lib/baseUrl";
 import { UrlModel } from "@/app/schemas/user-url-clicks.Schema";
-import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -13,42 +14,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "URL is required" }, { status: 400 });
     }
 
-    const token = req.cookies.get("token")?.value;
+    const user = getAuthUser(req);
 
-    if (!token) {
+    if (!user) {
       return NextResponse.json(
-        { message: "Unauthorized: No token found" },
+        { message: "Unauthorized: please log in" },
         { status: 401 },
       );
     }
-
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-        id: string;
-        email: string;
-      };
-    } catch (err) {
-      return NextResponse.json(
-        { message: "Invalid or expired token", err },
-        { status: 401 },
-      );
-    }
-
-    const userId = decoded.id;
 
     const shortCode = Math.random().toString(36).substring(2, 8);
 
     await UrlModel.create({
       originalUrl: url,
       shortCode,
-      userId,
+      userId: user.id,
     });
 
     return NextResponse.json(
       {
         message: "Short URL created successfully",
-        shortUrl: `http://localhost:3000/${shortCode}`,
+        shortUrl: `${getBaseUrl(req)}/${shortCode}`,
       },
       { status: 200 },
     );

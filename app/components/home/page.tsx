@@ -49,8 +49,14 @@ const HomePage = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      const { shortUrl } = await response.json();
-      setData(shortUrl);
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(true);
+        return;
+      }
+
+      setData(result.shortUrl);
     } catch (error) {
       setError(true);
       console.error(error);
@@ -83,11 +89,15 @@ const HomePage = () => {
 
   return (
     <div className="">
-      <div className="min-h-screen bg-gray-100 w-full flex flex-col items-center pt-24">
+      <div className="flex min-h-screen w-full flex-col items-center bg-gray-100 px-4 pt-16 sm:pt-24">
         {/* Hero Section */}
-        <div className="text-center max-w-2xl flex flex-col gap-4">
-          <h1 className="text-4xl font-bold text-black">Shorten links.</h1>
-          <h1 className="text-4xl font-bold text-black"> Track every click.</h1>
+        <div className="flex w-full max-w-2xl flex-col gap-4 text-center">
+          <h1 className="text-3xl font-bold text-black sm:text-4xl">
+            Shorten links.
+          </h1>
+          <h1 className="text-3xl font-bold text-black sm:text-4xl">
+            Track every click.
+          </h1>
 
           <p className="text-gray-600">
             Create short, memorable links and see exactly where your audience
@@ -95,7 +105,7 @@ const HomePage = () => {
           </p>
 
           {/* Input + Button */}
-          <div className="flex gap-2 mt-4 mx-auto">
+          <div className="mt-4 flex w-full flex-col gap-2 sm:flex-row">
             <Input
               placeholder="Paste a long URL here..."
               value={url}
@@ -105,7 +115,7 @@ const HomePage = () => {
 
             <Button
               buttonText="Shorten It"
-              className="px-6 text-white"
+              className="px-6 py-3 text-white"
               onClick={() => {
                 handleSubmit();
               }}

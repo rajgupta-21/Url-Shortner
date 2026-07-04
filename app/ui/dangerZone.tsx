@@ -1,7 +1,16 @@
 "use client";
+import { Dispatch, SetStateAction } from "react";
 import Button from "./button";
 
-const DangerZone = ({ setIsOpenDialogBox, setIsOpenDialogBoxForUser }) => {
+type DangerZoneProps = {
+  setIsOpenDialogBox: Dispatch<SetStateAction<boolean>>;
+  setIsOpenDialogBoxForUser: Dispatch<SetStateAction<boolean>>;
+};
+
+const DangerZone = ({
+  setIsOpenDialogBox,
+  setIsOpenDialogBoxForUser,
+}: DangerZoneProps) => {
   return (
     <div>
       <div className="m-5 p-5 rounded-xl border-[0.8px] border-red-400 ">

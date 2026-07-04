@@ -8,27 +8,49 @@ const RegisterPage = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const FetchLoginData = async () => {
-    const response = await fetch("/api/register", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: firstname,
-        lastName: lastName,
-        email: email,
-        password: password,
-      }),
-    });
-    const data = response.json();
-    console.log(data);
+  const FetchRegisterData = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: firstname,
+          lastName,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Registration failed");
+        return;
+      }
+
+      localStorage.setItem("userID", data.userId);
+      localStorage.setItem("email", data.email);
+      router.push("/components/overview");
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white text-black  p-8 rounded-xl shadow-md max-w-[600px] flex flex-col gap-4 border border-black">
-        <h1 className="text-xl font-bold text-center">Welcome To LinkSnap</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+      <div className="flex w-full max-w-md flex-col gap-4 rounded-xl border border-black bg-white p-6 text-black shadow-md sm:p-8">
+        <h1 className="text-center text-xl font-bold">Welcome To LinkSnap</h1>
         <p className="text-center text-gray-500">Create your free account</p>
 
         <Input
@@ -60,10 +82,15 @@ const RegisterPage = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
+        {error && (
+          <div className="text-center text-sm text-red-500">{error}</div>
+        )}
+
         <Button
-          className="w-fit px-10 py-2 mx-auto"
-          buttonText="Create Account"
-          onClick={FetchLoginData}
+          className="mx-auto w-fit px-10 py-2 text-white disabled:opacity-50"
+          buttonText={loading ? "Creating..." : "Create Account"}
+          onClick={FetchRegisterData}
+          disabled={loading}
         ></Button>
         <div className="flex flex-col">
           <span className="mx-auto">Or</span>

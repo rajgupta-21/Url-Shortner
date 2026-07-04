@@ -1,19 +1,28 @@
 "use client";
 
 import { Mail, Shield, User, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useApiCall } from "../hooks/apicallhook";
 import { UserResponse } from "../utils/types";
 import Button from "./button";
 import Input from "./input";
 
-const AccountsSection = ({ name, setName, email, setEmail }) => {
-  const [userId, setUserId] = useState<string | null>(null);
+type AccountsSectionProps = {
+  name: string | null;
+  setName: Dispatch<SetStateAction<string | null>>;
+  email: string | null;
+  setEmail: Dispatch<SetStateAction<string | null>>;
+};
 
-  useEffect(() => {
-    const id = localStorage.getItem("userID");
-    setUserId(id);
-  }, []);
+const AccountsSection = ({
+  name,
+  setName,
+  email,
+  setEmail,
+}: AccountsSectionProps) => {
+  const [userId] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("userID") : null,
+  );
 
   const { data, error, loading } = useApiCall<UserResponse>(
     userId ? `/api/get-user/?userId=${userId}` : null,
@@ -37,7 +46,7 @@ const AccountsSection = ({ name, setName, email, setEmail }) => {
     if (data?.user.email) {
       setEmail(data.user.email);
     }
-  }, [data]);
+  }, [data, setName, setEmail]);
 
   const [validationErrors, setValidationErrors] = useState<{
     oldPassword?: string;
@@ -155,7 +164,7 @@ const AccountsSection = ({ name, setName, email, setEmail }) => {
             <div className="w-full md:w-80">
               <Input
                 className="border-gray-300 bg-gray-50 text-sm font-extralight focus:bg-white"
-                value={name}
+                value={name ?? ""}
                 onChange={(e) => {
                   setName(e.target.value);
                 }}
@@ -185,7 +194,7 @@ const AccountsSection = ({ name, setName, email, setEmail }) => {
             <div className="w-full md:w-80">
               <Input
                 className="border-gray-300 bg-gray-50 text-sm font-extralight focus:bg-white"
-                value={email}
+                value={email ?? ""}
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}

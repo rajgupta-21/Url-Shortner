@@ -1,15 +1,18 @@
+import { dbConnect } from "@/app/db/db";
+import { authCookieOptions, createToken } from "@/app/lib/auth";
 import { UserModel } from "@/app/schemas/user-url-clicks.Schema";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
+    await dbConnect();
+
     const { name, lastName, email, password } = await req.json();
 
-    if (!name || !lastName || !email || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        { message: "Name, email and password are required" },
         { status: 400 },
       );
     }
@@ -23,32 +26,36 @@ export async function POST(req: Request) {
       );
     }
 
+    const fullName = lastName ? `${name} ${lastName}` : name;
     const hashedPass = await bcrypt.hash(password, 10);
 
     const user = await UserModel.create({
-      name,
-      lastName,
+      name: fullName,
       email,
       password: hashedPass,
     });
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: "1d" },
-    );
+    const token = createToken({ id: user._id.toString(), email: user.email });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: "User created successfully",
-        user,
-        token,
+        userId: user._id,
+        email: user.email,
+        plan: user.plan,
       },
       { status: 201 },
     );
+
+    response.cookies.set("token", token, authCookieOptions);
+
+    return response;
   } catch (error) {
     return NextResponse.json(
-      { message: "Internal Server Error", error: error },
+      {
+        message: "Internal Server Error",
+        error: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

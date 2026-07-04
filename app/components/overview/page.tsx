@@ -3,13 +3,17 @@ import { useApiCall } from "@/app/hooks/apicallhook";
 import Card from "@/app/ui/card";
 import BarChart from "@/app/ui/chart";
 import MylinksTable, { LinkItem } from "@/app/ui/mylinks";
+import { AnalyticsResponse } from "@/app/utils/types";
 import { useEffect, useState } from "react";
 
 const OverviewPage = () => {
-  const { data, error, loading } = useApiCall(`/api/clicksPerLink`, {
-    method: "GET",
-    credentials: "include",
-  });
+  const { data, error, loading } = useApiCall<AnalyticsResponse>(
+    `/api/clicksPerLink`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
 
   const [urlData, setUrlData] = useState<LinkItem[]>([]);
   const [urlError, setUrlError] = useState("");
